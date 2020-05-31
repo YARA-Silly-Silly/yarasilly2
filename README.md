@@ -48,10 +48,10 @@ Config for the application is also present in the file **config.ini** in the roo
 **Example**
 
 ```
-python yarasilly2.py  -r "Test-Rule" -t "APT" -a "Himadri Ganguly" -o 2 -f "office"
+python yarasilly2.py  -r "Test-Rule" -t "APT" -a "John Doe" -o 2 -f "office"
 ```
 
-The above command will pass the name of the rule **Test-Rule**, tag **APT**, author **Himadri Ganguly**, pattern occurance **2** and sample file type **office**
+The above command will pass the name of the rule **Test-Rule**, tag **APT**, author **John Doe**, pattern occurance **2** and sample file type **office**
 
 <img src="docs/\_static/yarasilly2_example.png" />
 
