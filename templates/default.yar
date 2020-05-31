@@ -7,7 +7,7 @@ meta:
   hash{{ loop.index }} = "{{ hash }}"
   {% endfor -%}
   sample_filetype = "{{ fileType }}"
-  yarasillysilly = "https://github.com/himadriganguly"
+  yarasilly2 = "https://github.com/YARA-Silly-Silly/yarasilly2"
 strings:
   {%- for pattern in patterns %}
   $string{{loop.index}} = {{ pattern }}{% endfor %}
