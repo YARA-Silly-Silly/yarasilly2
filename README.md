@@ -55,6 +55,17 @@ The above command will pass the name of the rule **Test-Rule**, tag **APT**, aut
 
 <img src="docs/\_static/yarasilly2_example.png" />
 
+## About Us
+
+Yara Silly Silly is maintained by:
+
+<table>
+  <tr>
+    <td align="center"><a href="https://www.linkedin.com/in/hganguly/"><img src="https://avatars0.githubusercontent.com/u/5839433?s=88&u=6ed858dba3762eb0d929b48649b787ac9db112b7&v=4" width="100px;" alt="himadriganguly"/><br /><sub><b>Himadri Ganguly</b></sub></a><br /><a href="https://github.com/himadriganguly" title="Code">:octocat:</a> <a href="https://twitter.com/himadritech" title="Twitter">:bird:</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/krishpaul/"><img src="https://avatars2.githubusercontent.com/u/3284091?s=400&u=9c3983a826301000f0d6b8191fdda6042b065157&v=4" width="100px;" alt="bidhata"/><br /><sub><b>Krishnendu Paul</b></sub></a><br /><a href="https://github.com/bidhata" title="Code">:octocat:</a> <a href="https://twitter.com/bidhata" title="Twitter">:bird:</a> <a href="https://krishnendu.com/" title="Website">:house:</a></td>
+  </tr>
+</table>
+
 ## LICENSE
 
 Yara Silly Silly is GNU GPL3 licensed. See the LICENSE file for details.
