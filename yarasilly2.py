@@ -112,7 +112,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
                     buf = filePointer.readline(blocksize).strip('\n')
                     if not buf:
                         break
-                    strPatterns.append(buf.split("-")[1])
+                    strPatterns.append(buf.split("-",1)[1])
 
             templateValDict["patterns"] = strPatterns
             templateValDict["condition"] = "any of them"
