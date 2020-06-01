@@ -17,6 +17,7 @@ class StringDump:
         return urls
 
     def __getStrings(self, filePath):
+        allStrings = []
         filePointer = open(filePath,'rb')
         while True:
             data = filePointer.read(self.blocksize).decode('ISO-8859-1')
@@ -26,10 +27,13 @@ class StringDump:
             regexp = '[%s]{%d,100}' % (chars, 6)
             pattern = re.compile(regexp)
             strlist = pattern.findall(data)
+            if len(strlist)>0:
+                allStrings.append(strlist)
             #Get Wide Strings
             unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
-            unicodelist = unicode_str.findall(data)
-            allStrings = unicodelist + strlist
+            unicodelist = list(set(unicode_str.findall(data)))
+            if len(unicodelist)>0:
+                allStrings.append(unicodelist)
             #Extract URLs if present
             exeurls = self.__linkSearch(data)
             if exeurls:
@@ -37,15 +41,16 @@ class StringDump:
                 allStrings.append(url)
         filePointer.close()
         if len(allStrings) > 0:
-            return list(set(allStrings))
+            return allStrings
         else:
           puts(colored.red('[!] No Extractable Attributes Present in\nFile: {}\nHash: {}\nPlease Remove it from the Sample Set and Try Again!'.format(filePath,md5sum(filePath))))
           sys.exit(1)
 
     def __removeBlackListStrings(self, allStrings):
         finalStringList = []
-        for str in allStrings:
-            finalStringList.append(str.replace("\x00", "").strip())
+        for stringArray in allStrings:
+            for str in stringArray:
+                finalStringList.append(str.replace("\x00", "").strip())
 
         with open(self.dirPath +'/modules/'+self.fileType+'_blacklist') as f:
             blackList = f.read().splitlines()
