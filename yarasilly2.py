@@ -172,13 +172,12 @@ if __name__ == '__main__':
     puts(colored.blue(f.renderText("Yara Silly Silly")))
     puts(colored.green("""
 ------------------------------------------------------------------------
-Yara Silly Silly generates YARA rules for you.
+Yara Silly Silly automatically generates YARA rules for you.
 Thank you for using the application
 Source code can be found at
 https://github.com/YARA-Silly-Silly/yarasilly2
-Contributed by:-
-Krishnendu Paul - https://github.com/bidhata
-Himadri Ganguly - https://github.com/himadriganguly
+Maintained by:-
+Krishnendu Paul and Himadri Ganguly
 ------------------------------------------------------------------------
     """))
 
