@@ -18,7 +18,7 @@ class SearchPattern:
         while (buf):
             buf = writeFilePointer.read(self.blocksize).splitlines()
             for str in buf:
-                if stringPattern in str.split("-"):
+                if stringPattern in str.split("-",1)[1]:
                     return False
         return True
 
