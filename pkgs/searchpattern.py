@@ -14,12 +14,12 @@ class SearchPattern:
 
     def __checkPatternPresent(self, writeFilePointer, stringPattern):
         writeFilePointer.seek(0)
-        buf = 1
-        while (buf):
-            buf = writeFilePointer.read(self.blocksize).splitlines()
-            for str in buf:
-                if stringPattern in str.split("-",1)[1]:
-                    return False
+        while True:
+            buf = writeFilePointer.readline()
+            if not buf:
+                break
+            elif buf and stringPattern in buf.split("-",1)[1]:
+                return False
         return True
 
     def __checkIfStringInFile(self, file, stringToSearch):
