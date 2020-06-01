@@ -50,7 +50,7 @@ class StringDump:
         finalStringList = []
         for stringArray in allStrings:
             for str in stringArray:
-                finalStringList.append(str.replace("\x00", "").strip())
+                finalStringList.append(str.strip())
 
         with open(self.dirPath +'/modules/'+self.fileType+'_blacklist') as f:
             blackList = f.read().splitlines()
