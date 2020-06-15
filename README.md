@@ -1,4 +1,4 @@
-<center> <img src="docs/\_static/yarasilly2.png" /> </center>
+<p align="center"><img src="docs/\_static/yarasilly2.png" /></p>
 
 # YARA Silly Silly
 
