@@ -1,3 +1,5 @@
+<center> <img src="docs/\_static/yarasilly2.png" /> </center>
+
 # YARA Silly Silly
 
 Automatic generation of YARA rules from sample files.
