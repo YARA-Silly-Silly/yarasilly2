@@ -10,6 +10,7 @@ from pkgs.utils import md5sum, listdir
 # sys.path.append('./libs')
 
 from pkgs.utils import splitDirFileName
+from pkgs.fuzzymatch import FuzzyMatch
 from pkgs.findfiles import FindFiles
 from pkgs.searchpattern import SearchPattern
 from pkgs.stringdump import StringDump
@@ -20,13 +21,14 @@ from pkgs.stringdump import StringDump
 @click.option('--matchpatternfile', '-m', type=click.STRING, help='Matched pattern will be saved to this file. Please provide full path eg: ./output/matched-pattern', required=False)
 @click.option('--inputfilepath', '-i', type=click.STRING, help='File or files will be read from this location eg: ./files-folder', required=False)
 @click.option('--folderdepth', '-fd', type=click.INT, help='How much depth within the inputfilepath the files will be searched. To search all files with any depth enter 0', required=False)
+@click.option('--fuzzymatch', '-fm', nargs=4, type=(str,int,str,int), help='Match file patterns using fuzzy hashing. Please provide folder path of confirm virus samples with match percentage of same type and probable virus samples with should be matched percent. For eg: -fm ./confirm-sample 80 ./probable-sample 60')
 @click.option('--patternoccurance', '-o', type=click.INT, help='How many match of the pattern within the files is considered as match.', required=False)
 @click.option('--block', '-b', type=click.INT, help='File buffer size when reading file.', required=False)
 @click.option('--loglevel', '-l', default='ERROR', type=click.Choice(['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'], case_sensitive=False), help='Select log level for the application.')
 @click.option('--author', '-a', type=click.STRING, default='N/A', help='Type you name to be filled in the author field in generate YARA rule. Eg. -n "John Doe"', required=False)
 @click.option('--description', '-d', type=click.STRING, default='No Description Provided', help='Provide a useful description of the YARA rule.', required=False)
 @click.option('--tags', '-t', type=click.STRING, default='', help="Apply Tags to Yara Rule For Easy Reference (AlphaNumeric)")
-def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None, folderdepth=None, patternoccurance=None, block=None, loglevel=None, author=None, description=None, tags=None):
+def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None, folderdepth=None, fuzzymatch=None, patternoccurance=None, block=None, loglevel=None, author=None, description=None, tags=None):
     optionFolderDepth = ''
     logLevelDict = {'CRITICAL': logging.CRITICAL, 'ERROR': logging.ERROR, 'WARNING': logging.WARNING, 'INFO': logging.INFO, 'DEBUG': logging.DEBUG}
     foundPattern = 0
@@ -65,6 +67,11 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
 
         if not os.path.exists(matchPatternDir):
             os.makedirs(matchPatternDir)
+
+        if fuzzymatch:
+            fuzzyMatchObj = FuzzyMatch(fuzzymatch[0], fuzzymatch[1], fuzzymatch[2], fuzzymatch[3], inputFilesPath)
+            fuzzyMatchObj.searchFiles()
+            del fuzzyMatchObj
 
         findFilesObj = FindFiles(inputFilesPath, folderDepth)
 
