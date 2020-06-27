@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/\_static/yarasilly2.png" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/YARA-Silly-Silly/yarasilly2/master/docs/_static/yarasilly2.png" /></p>
 
 # YARA Silly Silly
 
