@@ -55,7 +55,7 @@ python yarasilly2.py  -r "Test-Rule" -t "APT" -a "John Doe" -o 2 -f "office"
 
 The above command will pass the name of the rule **Test-Rule**, tag **APT**, author **John Doe**, pattern occurance **2** and sample file type **office**
 
-<img src="docs/\_static/yarasilly2_example.png" />
+<img src="https://github.com/YARA-Silly-Silly/yarasilly2/blob/master/docs/_static/yarasilly2_example.png" />
 
 ## About Us
 
