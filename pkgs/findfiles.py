@@ -5,9 +5,6 @@ from pkgs.utils import listdir
 
 class FindFiles:
 
-    fileArray = []
-    fileHash = []
-
     def __init__(self,inputFilesPath,folderDepth):
         self.inputFilesPath = inputFilesPath
         self.folderDepth = folderDepth
@@ -40,6 +37,6 @@ class FindFiles:
                     yield filePath
             print("\n")
 
-        except Exception as error:            
+        except Exception as error:
             raise Exception(error)
             sys.exit(1)
