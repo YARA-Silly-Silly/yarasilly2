@@ -166,3 +166,5 @@ cython_debug/
 log/
 input-folder/
 output/
+confirm-sample/
+probable-sample/
