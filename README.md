@@ -31,7 +31,11 @@ python -m virtualenv venv
 .\venv\Scripts\activate.bat
 ```
 
-2. Install the package inside the environment:
+3. Install ssdeep according to your **OS** from
+
+[https://python-ssdeep.readthedocs.io/en/latest/installation.html#installation](https://python-ssdeep.readthedocs.io/en/latest/installation.html#installation)
+
+4. Install the package inside the environment:
 
 ```
 pip install -r requirements
