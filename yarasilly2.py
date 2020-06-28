@@ -17,7 +17,7 @@ from pkgs.stringdump import StringDump
 
 @click.command(context_settings=dict(show_default=True))
 @click.option('--rulename', '-r', type=click.STRING, help='Provide a rule name with no spaces and must start with letter."', required=True)
-@click.option('--filetype', '-f', type=click.Choice(['unknown', 'office', 'email'], case_sensitive=False), help='Select sample set file type choices.', required=True)
+@click.option('--filetype', '-f', type=click.Choice(['office'], case_sensitive=False), help='Select sample set file type choices.', required=True)
 @click.option('--matchpatternfile', '-m', type=click.STRING, help='Matched pattern will be saved to this file. Please provide full path eg: ./output/matched-pattern', required=False)
 @click.option('--inputfilepath', '-i', type=click.STRING, help='File or files will be read from this location eg: ./files-folder', required=False)
 @click.option('--folderdepth', '-fd', type=click.INT, help='How much depth within the inputfilepath the files will be searched. To search all files with any depth enter 0', required=False)
