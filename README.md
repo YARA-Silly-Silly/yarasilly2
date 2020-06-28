@@ -2,7 +2,7 @@
 
 # YARA Silly Silly
 
-Automatic generation of YARA rules from sample files.
+Automatic generation of YARA rules from sample virus files. You can find some sample virus files at [https://github.com/YARA-Silly-Silly/sample-malwares](https://github.com/YARA-Silly-Silly/sample-malwares)
 
 ## Installing YARA Silly Silly
 
