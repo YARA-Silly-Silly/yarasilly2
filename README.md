@@ -61,6 +61,59 @@ The above command will pass the name of the rule **Test-Rule**, tag **APT**, aut
 
 <img src="https://raw.githubusercontent.com/YARA-Silly-Silly/yarasilly2/master/docs/_static/yarasilly2_example.png" />
 
+## Command Line Parameters
+
+```
+Usage: yarasilly2.py [OPTIONS]
+
+Options:
+  -r, --rulename TEXT             Provide a rule name with no spaces and must
+                                  start with letter.  [required]
+
+  -f, --filetype [office]         Select sample set file type choices.
+                                  [required]
+
+  -m, --matchpatternfile TEXT     Matched pattern will be saved to this file.
+                                  Please provide full path eg:
+                                  ./output/matched-pattern
+
+  -i, --inputfilepath TEXT        File or files will be read from this
+                                  location eg: ./files-folder
+
+  -fd, --folderdepth INTEGER      How much depth within the inputfilepath the
+                                  files will be searched. To search all files
+                                  with any depth enter 0
+
+  -fm, --fuzzymatch <TEXT INTEGER TEXT INTEGER>...
+                                  Match file patterns using fuzzy hashing.
+                                  Please provide folder path of confirm virus
+                                  samples with match percentage of same type
+                                  and probable virus samples with should be
+                                  matched percent. For eg: -fm ./confirm-
+                                  sample 80 ./probable-sample 60
+
+  -o, --patternoccurance INTEGER  How many match of the pattern within the
+                                  files is considered as match.
+
+  -b, --block INTEGER             File buffer size when reading file.
+  -l, --loglevel [CRITICAL|ERROR|WARNING|INFO|DEBUG]
+                                  Select log level for the application.
+                                  [default: ERROR]
+
+  -a, --author TEXT               Type you name to be filled in the author
+                                  field in generate YARA rule. Eg. -n "John
+                                  Doe"  [default: N/A]
+
+  -d, --description TEXT          Provide a useful description of the YARA
+                                  rule.  [default: No Description Provided]
+
+  -t, --tags TEXT                 Apply Tags to Yara Rule For Easy Reference
+                                  (AlphaNumeric)  [default: ]
+
+  --help                          Show this message and exit.  [default:
+                                  False]
+```
+
 ## About Us
 
 Yara Silly Silly is maintained by:
