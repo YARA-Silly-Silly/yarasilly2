@@ -4,6 +4,8 @@
 
 Automatic generation of YARA rules from sample virus files. You can find some sample virus files at [https://github.com/YARA-Silly-Silly/sample-malwares](https://github.com/YARA-Silly-Silly/sample-malwares)
 
+You can find the project repo at [https://github.com/YARA-Silly-Silly/yarasilly2](https://github.com/YARA-Silly-Silly/yarasilly2)
+
 ## Installing YARA Silly Silly
 
 **Python3 is required.**
