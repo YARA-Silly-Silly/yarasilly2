@@ -2,7 +2,9 @@
 
 # YARA Silly Silly
 
-Automatic generation of YARA rules from sample virus files. You can find some sample virus files at [https://github.com/YARA-Silly-Silly/sample-malwares](https://github.com/YARA-Silly-Silly/sample-malwares)
+A Semi automatic handy tool to generate YARA rules from sample virus files ( WIP ) for Malware Analyst, inspired by DIFF function of VirusTotal Premium Account. 
+
+You can find some sample virus files at [https://github.com/YARA-Silly-Silly/sample-malwares](https://github.com/YARA-Silly-Silly/sample-malwares)
 
 You can find the project repo at [https://github.com/YARA-Silly-Silly/yarasilly2](https://github.com/YARA-Silly-Silly/yarasilly2)
 
