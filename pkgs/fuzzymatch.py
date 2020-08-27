@@ -18,7 +18,6 @@ class FuzzyMatch:
         try:
             if os.listdir(self.confirmPath):
                 fileName = random.choice(os.listdir(self.confirmPath))
-                os.path.join(self.confirmPath, fileName)
                 filePath = os.path.join(self.confirmPath, fileName)
             else:
                 raise Exception("Empty confirm virus sample folder.")
