@@ -42,7 +42,8 @@ python -m virtualenv venv
 4. Install the package inside the environment:
 
 ```
-pip install -r requirements
+apt install libffi-dev libfuzzy-dev libfuzzy2
+pip3 install -r requirements
 ```
 
 ## QuickStart
