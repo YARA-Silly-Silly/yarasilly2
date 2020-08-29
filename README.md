@@ -2,7 +2,7 @@
 
 # YARA Silly Silly
 
-A Semi automatic handy tool to generate YARA rules from sample virus files ( WIP ) for Malware Analyst, inspired by DIFF function of VirusTotal Premium Account. 
+A Semi automatic handy tool to generate YARA rules from sample virus files ( WIP ) for Malware Analyst, inspired by DIFF function of VirusTotal Premium Account.
 
 You can find some sample virus files at [https://github.com/YARA-Silly-Silly/sample-malwares](https://github.com/YARA-Silly-Silly/sample-malwares)
 
@@ -24,25 +24,30 @@ cd yarasilly2
 `Linux`
 
 ```
-python -m virtualenv venv
+python -m venv venv
 source venv/bin/activate
 ```
 
 `Windows`
 
 ```
-python -m virtualenv venv
+python -m venv venv
 .\venv\Scripts\activate.bat
 ```
 
-3. Install ssdeep according to your **OS** from
+2. Install ssdeep according to your **OS** from
 
 [https://python-ssdeep.readthedocs.io/en/latest/installation.html#installation](https://python-ssdeep.readthedocs.io/en/latest/installation.html#installation)
 
-4. Install the package inside the environment:
+**Example Ubuntu 20.04**
 
 ```
-apt install libffi-dev libfuzzy-dev libfuzzy2
+sudo apt-get install build-essential libffi-dev python3 python3-dev python3-pip libfuzzy-dev
+```
+
+3. Install the package inside the environment:
+
+```
 pip3 install -r requirements
 ```
 
