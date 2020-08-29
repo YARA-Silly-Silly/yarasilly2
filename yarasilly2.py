@@ -56,6 +56,14 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
         occurance = patternoccurance if patternoccurance else int(config['DEFAULT']['occurance'])
         blocksize = block if block else int(config['DEFAULT']['blocksize'])
 
+        if not os.path.exists(inputFilesPath):
+            try:
+                click.confirm("Malwares input folder not present. You want to create it?", default=True, abort=True)
+                os.makedirs(inputFilesPath)
+            except click.exceptions.Abort:
+                print("Exciting application.")
+                sys.exit(0)
+
         # Logging config
         if not os.path.exists(config['LOG']['logFilePath']):
             os.makedirs(config['LOG']['logFilePath'])
