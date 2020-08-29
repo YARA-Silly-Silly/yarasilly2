@@ -67,9 +67,17 @@ Config for the application is also present in the file **config.ini** in the roo
 python yarasilly2.py  -r "Test-Rule" -t "APT" -a "John Doe" -o 2 -f "office"
 ```
 
-The above command will pass the name of the rule **Test-Rule**, tag **APT**, author **John Doe**, pattern occurance **2** and sample file type **office**
+The above command will pass the name of the rule **Test-Rule**, tag **APT**, author **John Doe**, pattern occurance **2** and sample file type **office**.
 
 <img src="https://raw.githubusercontent.com/YARA-Silly-Silly/yarasilly2/master/docs/_static/yarasilly2_example.png" />
+
+Using **fuzzy match** example
+
+```
+python yarasilly2.py  -r "Test-Rule" -t "APT" -a "John Doe" -f "office" -fm ./confirm-sample 80 ./probable-sample 60
+```
+
+The above command will pass the name of the rule **Test-Rule**, tag **APT**, author **John Doe**, file type **office** and then **fuzzy match** parameters, the first is the confirm malware samples folder, second is the percentage of match between all the files in that folder, third is the probable malware samples folder and fourth one is the percentage of match with the files within the probable folder.
 
 ## Command Line Parameters
 
