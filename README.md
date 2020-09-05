@@ -48,7 +48,7 @@ sudo apt-get install build-essential libffi-dev python3 python3-dev python3-pip 
 3. Install the package inside the environment:
 
 ```
-pip3 install -r requirements
+pip3 install -r requirements.txt
 ```
 
 ## QuickStart
