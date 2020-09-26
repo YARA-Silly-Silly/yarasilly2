@@ -143,6 +143,10 @@ Yara Silly Silly is maintained by:
   </tr>
 </table>
 
+## Contributing
+
+Please see our [CONTRIBUTING.md](/CONTRIBUTING.md).
+
 ## LICENSE
 
 Yara Silly Silly is GNU GPL3 licensed. See the LICENSE file for details.
