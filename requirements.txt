@@ -8,4 +8,4 @@ pycparser==2.20
 pyfiglet==0.8.post1
 six==1.15.0
 ssdeep==3.4
-tqdm==4.46.0
+tqdm==4.66.3
