@@ -13,7 +13,7 @@ class StringDump:
         self.blocksize = blocksize
 
     def __linkSearch(self, attachment):
-        urls = list(set(re.compile('(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I).findall(attachment)))
+        urls = list(set(re.compile(r'(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I).findall(attachment)))
         return urls
 
     def __getStrings(self, filePath):
