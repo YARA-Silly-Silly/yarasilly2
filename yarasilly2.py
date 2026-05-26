@@ -1,4 +1,5 @@
 import os, sys, logging, configparser, tempfile, shutil, click, re
+import concurrent.futures
 from pyfiglet import Figlet
 from clint.textui import puts, colored
 from tqdm import tqdm
@@ -28,7 +29,8 @@ from pkgs.stringdump import StringDump
 @click.option('--author', '-a', type=click.STRING, default='N/A', help='Type you name to be filled in the author field in generate YARA rule. Eg. -n "John Doe"', required=False)
 @click.option('--description', '-d', type=click.STRING, default='No Description Provided', help='Provide a useful description of the YARA rule.', required=False)
 @click.option('--tags', '-t', type=click.STRING, default='', help="Apply Tags to Yara Rule For Easy Reference (AlphaNumeric)")
-def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None, folderdepth=None, fuzzymatch=None, patternoccurance=None, block=None, loglevel=None, author=None, description=None, tags=None):
+@click.option('--workers', '-w', type=click.INT, default=1, help='Number of worker processes to run string extraction in parallel.')
+def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None, folderdepth=None, fuzzymatch=None, patternoccurance=None, block=None, loglevel=None, author=None, description=None, tags=None, workers=1):
     optionFolderDepth = ''
     logLevelDict = {'CRITICAL': logging.CRITICAL, 'ERROR': logging.ERROR, 'WARNING': logging.WARNING, 'INFO': logging.INFO, 'DEBUG': logging.DEBUG}
     foundPattern = 0
@@ -90,9 +92,16 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
             os.makedirs(tempFolder)
 
         stringDumpObj = StringDump(dirPath, 'office', tempFolder, blocksize)
-        for file in findFilesObj.searchFiles():
-            fileHash.append(md5sum(file))
+
+        def process_file(file):
+            hash_val = md5sum(file)
             stringDumpObj.dumpStringsToTempFile(file)
+            return hash_val
+
+        files_to_process = list(findFilesObj.searchFiles())
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+            fileHash = list(executor.map(process_file, files_to_process))
 
         del findFilesObj
         del stringDumpObj

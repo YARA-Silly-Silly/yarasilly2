@@ -81,6 +81,9 @@ Options:
   -f, --filetype [office]         Select sample set file type choices.
                                   [required]
 
+  -w, --workers INTEGER           Number of worker processes to run string extraction in parallel.
+                                  [default: 1]
+
   -m, --matchpatternfile TEXT     Matched pattern will be saved to this file.
                                   Please provide full path eg:
                                   ./output/matched-pattern
