@@ -35,17 +35,7 @@ python -m venv venv
 .\venv\Scripts\activate.bat
 ```
 
-2. Install ssdeep according to your **OS** from
-
-[https://python-ssdeep.readthedocs.io/en/latest/installation.html#installation](https://python-ssdeep.readthedocs.io/en/latest/installation.html#installation)
-
-**Example Ubuntu 20.04**
-
-```
-sudo apt-get install build-essential libffi-dev python3 python3-dev python3-pip libfuzzy-dev
-```
-
-3. Install the package inside the environment:
+2. Install the package inside the environment:
 
 ```
 pip3 install -r requirements.txt
