@@ -1,4 +1,4 @@
-import os, time, random, ssdeep, shutil
+import os, time, random, ppdeep, shutil
 from tqdm import tqdm
 
 from pkgs.utils import listdir
@@ -23,7 +23,7 @@ class FuzzyMatch:
                 raise Exception("Empty confirm virus sample folder.")
 
             print("Reference File For Fuzzy Hash: {}".format(filePath))
-            refHash = ssdeep.hash_from_file(filePath)
+            refHash = ppdeep.hash_from_file(filePath)
             print("Fuzzy Hash Of Reference File: {}\n".format(refHash))
             # Preprocess the total files count
             fileCounter = 0
@@ -42,9 +42,9 @@ class FuzzyMatch:
                             self.confirmPathFileHash.append(refHash)
                             shutil.copy(traverseFilePath, self.inputFilesPath)
                             continue
-                        tmpHash = ssdeep.hash_from_file(traverseFilePath)
-                        # print("File: ", traverseFilePath, " - ", ssdeep.compare(refHash, tmpHash))
-                        if ssdeep.compare(refHash, tmpHash) >= self.confirmFilesPercent:
+                        tmpHash = ppdeep.hash_from_file(traverseFilePath)
+                        # print("File: ", traverseFilePath, " - ", ppdeep.compare(refHash, tmpHash))
+                        if ppdeep.compare(refHash, tmpHash) >= self.confirmFilesPercent:
                             self.confirmPathFileHash.append(tmpHash)
                             shutil.copy(traverseFilePath, self.inputFilesPath)
                         else:
@@ -62,10 +62,10 @@ class FuzzyMatch:
                     for traverseFilePath in listdir(self.probablePath):
                         pbar.update(1)
                         pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
-                        tmpHash = ssdeep.hash_from_file(traverseFilePath)
+                        tmpHash = ppdeep.hash_from_file(traverseFilePath)
                         for fileHash in self.confirmPathFileHash:
-                            # print("File: ", traverseFilePath, " - ", ssdeep.compare(refHash, tmpHash))
-                            if ssdeep.compare(fileHash, tmpHash) >= self.probableFilesPercent:
+                            # print("File: ", traverseFilePath, " - ", ppdeep.compare(refHash, tmpHash))
+                            if ppdeep.compare(fileHash, tmpHash) >= self.probableFilesPercent:
                                 shutil.copy(traverseFilePath, self.inputFilesPath)
                                 break
             print("\n")
