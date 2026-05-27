@@ -3,9 +3,9 @@ import os, hashlib
 def splitDirFileName(filePath):
     return os.path.split(os.path.abspath(filePath))
 
-def md5sum(filename):
+def sha256sum(filename):
   fh = open(filename, 'rb')
-  m = hashlib.md5()
+  m = hashlib.sha256()
   while True:
       data = fh.read(2048)
       if not data:
