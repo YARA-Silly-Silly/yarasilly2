@@ -14,6 +14,26 @@ class FuzzyMatch:
         self.probableFilesPercent = probableFilesPercent
         self.inputFilesPath = inputFilesPath
 
+    def _process_confirm_file(self, traverseFilePath, refHash, filePath):
+        if filePath == traverseFilePath:
+            self.confirmPathFileHash.append(refHash)
+            shutil.copy(traverseFilePath, self.inputFilesPath)
+            return
+
+        tmpHash = ppdeep.hash_from_file(traverseFilePath)
+        if ppdeep.compare(refHash, tmpHash) >= self.confirmFilesPercent:
+            self.confirmPathFileHash.append(tmpHash)
+            shutil.copy(traverseFilePath, self.inputFilesPath)
+        else:
+            shutil.copy(traverseFilePath, self.probablePath)
+
+    def _process_probable_file(self, traverseFilePath):
+        tmpHash = ppdeep.hash_from_file(traverseFilePath)
+        for fileHash in self.confirmPathFileHash:
+            if ppdeep.compare(fileHash, tmpHash) >= self.probableFilesPercent:
+                shutil.copy(traverseFilePath, self.inputFilesPath)
+                break
+
     def searchFiles(self):
         try:
             if os.listdir(self.confirmPath):
@@ -27,7 +47,7 @@ class FuzzyMatch:
             print("Fuzzy Hash Of Reference File: {}\n".format(refHash))
             # Preprocess the total files count
             fileCounter = 0
-            for filePath in listdir(self.confirmPath):
+            for _ in listdir(self.confirmPath):
                 fileCounter += 1
 
             if fileCounter == 1:
@@ -37,22 +57,12 @@ class FuzzyMatch:
                 with tqdm(total=fileCounter, unit="files", desc="Fuzzy find in confirm path: ") as pbar:
                     for traverseFilePath in listdir(self.confirmPath):
                         pbar.update(1)
-                        pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
-                        if filePath == traverseFilePath:
-                            self.confirmPathFileHash.append(refHash)
-                            shutil.copy(traverseFilePath, self.inputFilesPath)
-                            continue
-                        tmpHash = ppdeep.hash_from_file(traverseFilePath)
-                        # print("File: ", traverseFilePath, " - ", ppdeep.compare(refHash, tmpHash))
-                        if ppdeep.compare(refHash, tmpHash) >= self.confirmFilesPercent:
-                            self.confirmPathFileHash.append(tmpHash)
-                            shutil.copy(traverseFilePath, self.inputFilesPath)
-                        else:
-                            shutil.copy(traverseFilePath, self.probablePath)
+                        pbar.set_postfix(file=traverseFilePath.split(os.path.sep)[-1:])
+                        self._process_confirm_file(traverseFilePath, refHash, filePath)
             print("\n")
 
             fileCounter = 0
-            for filePath in listdir(self.probablePath):
+            for _ in listdir(self.probablePath):
                 fileCounter += 1
 
             if fileCounter == 0:
@@ -61,13 +71,8 @@ class FuzzyMatch:
                 with tqdm(total=fileCounter, unit="files", desc="Fuzzy find in probable path: ") as pbar:
                     for traverseFilePath in listdir(self.probablePath):
                         pbar.update(1)
-                        pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
-                        tmpHash = ppdeep.hash_from_file(traverseFilePath)
-                        for fileHash in self.confirmPathFileHash:
-                            # print("File: ", traverseFilePath, " - ", ppdeep.compare(refHash, tmpHash))
-                            if ppdeep.compare(fileHash, tmpHash) >= self.probableFilesPercent:
-                                shutil.copy(traverseFilePath, self.inputFilesPath)
-                                break
+                        pbar.set_postfix(file=traverseFilePath.split(os.path.sep)[-1:])
+                        self._process_probable_file(traverseFilePath)
             print("\n")
         except Exception as error:
             raise Exception(error)
