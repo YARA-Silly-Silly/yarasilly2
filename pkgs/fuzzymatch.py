@@ -1,4 +1,4 @@
-import os, time, random, ppdeep, shutil
+import os, random, ppdeep, shutil
 from tqdm import tqdm
 
 from pkgs.utils import listdir
