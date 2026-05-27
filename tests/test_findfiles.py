@@ -36,3 +36,11 @@ def test_findfiles_depth_1():
 
         assert len(files) == 1
         assert any(f.endswith("file1.txt") for f in files)
+
+def test_findfiles_exception(mocker):
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        ff = FindFiles(tmpdirname, None)
+        mocker.patch.object(ff, '_FindFiles__walk', side_effect=Exception("Test Exception"))
+
+        with pytest.raises(Exception):
+            list(ff.searchFiles())
