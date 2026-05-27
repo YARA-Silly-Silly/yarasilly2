@@ -58,8 +58,8 @@ class StringDump:
             regBlackList = f.read().splitlines()
 
         #Match Against Blacklist
-        for black in blackList:
-            if black in finalStringList: finalStringList.remove(black)
+        blackSet = set(blackList)
+        finalStringList = [s for s in finalStringList if s not in blackSet]
         #Match Against Regex Blacklist
         regmatchList = []
         for regblack in regBlackList:
