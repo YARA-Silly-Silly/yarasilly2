@@ -1,0 +1,213 @@
+import os, sys, logging, configparser, tempfile, shutil, click, re
+from pyfiglet import Figlet
+from clint.textui import puts, colored
+from tqdm import tqdm
+from datetime import datetime
+from jinja2 import Environment, FileSystemLoader
+
+from pkgs.utils import md5sum, listdir
+
+# sys.path.append('./libs')
+
+from pkgs.utils import splitDirFileName
+from pkgs.fuzzymatch import FuzzyMatch
+from pkgs.findfiles import FindFiles
+from pkgs.searchpattern import SearchPattern
+from pkgs.stringdump import StringDump
+
+def load_config(matchpatternfile, inputfilepath, folderdepth, patternoccurance, block, loglevel):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    optionFolderDepth = ''
+    if folderdepth:
+        optionFolderDepth = None if folderdepth == 0 else folderdepth
+
+    matchPatternDir = splitDirFileName(matchpatternfile)[0] if matchpatternfile else config['DEFAULT']['matchPatternFilePath']
+    matchPatternFilePath = matchpatternfile if matchpatternfile else os.path.join(config['DEFAULT']['matchPatternFilePath'], config['DEFAULT']['matchPatternFileName'])
+    inputFilesPath = inputfilepath if inputfilepath else config['DEFAULT']['inputFilesPath']
+    folderDepth = optionFolderDepth if optionFolderDepth else int(config['DEFAULT']['folderDepth'])
+    occurance = patternoccurance if patternoccurance else int(config['DEFAULT']['occurance'])
+    blocksize = block if block else int(config['DEFAULT']['blocksize'])
+
+    if not os.path.exists(inputFilesPath):
+        try:
+            click.confirm("Malwares input folder not present. You want to create it?", default=True, abort=True)
+            os.makedirs(inputFilesPath)
+        except click.exceptions.Abort:
+            print("Exiting application.")
+            sys.exit(0)
+
+    # Logging config
+    if not os.path.exists(config['LOG']['logFilePath']):
+        os.makedirs(config['LOG']['logFilePath'])
+
+    logLevelDict = {'CRITICAL': logging.CRITICAL, 'ERROR': logging.ERROR, 'WARNING': logging.WARNING, 'INFO': logging.INFO, 'DEBUG': logging.DEBUG}
+    if loglevel.upper() != "ERROR" and logLevelDict.get(loglevel.upper()):
+        logging.basicConfig(filename=os.path.join(config['LOG']['logFilePath'], config['LOG']['logFileName']),format='%(asctime)s - %(levelname)s - %(message)s',level=logLevelDict[loglevel.upper()])
+    else:
+        logging.basicConfig(filename=os.path.join(config['LOG']['logFilePath'], config['LOG']['logFileName']),format='%(asctime)s - %(levelname)s - %(message)s',level=logging.ERROR)
+
+    if not os.path.exists(matchPatternDir):
+        os.makedirs(matchPatternDir)
+
+    return matchPatternDir, matchPatternFilePath, inputFilesPath, folderDepth, occurance, blocksize
+
+def process_files(inputFilesPath, folderDepth, blocksize):
+    findFilesObj = FindFiles(inputFilesPath, folderDepth)
+
+    fileHash = []
+    dirPath = os.path.dirname(os.path.abspath(__file__))
+    tempFolder = os.path.join(tempfile.gettempdir(), "yara-silly-silly")
+    if not os.path.exists(tempFolder):
+        os.makedirs(tempFolder)
+
+    stringDumpObj = StringDump(dirPath, 'office', tempFolder, blocksize)
+    for file in findFilesObj.searchFiles():
+        fileHash.append(md5sum(file))
+        stringDumpObj.dumpStringsToTempFile(file)
+
+    return fileHash, tempFolder
+
+def generate_yara_rule(rulename, tags, author, description, fileHash, matchPatternFilePath, matchPatternDir, blocksize, yaraTemplate):
+    templateValDict = {
+        "ruleName": rulename,
+        "ruleTag": tags,
+        "authorName": author,
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "desc": description,
+        "hashArray": fileHash,
+        "fileType": "office"
+    }
+
+    strPatterns = []
+    with open(matchPatternFilePath, 'r') as filePointer:
+        while True:
+            buf = filePointer.readline(blocksize).strip('\n')
+            if not buf:
+                break
+            if "\x00" in buf:
+                str_val = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"').replace("\x00","") + "\" wide"
+                strPatterns.append(str_val)
+            else:
+                str_val = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"') + "\""
+                strPatterns.append(str_val)
+
+    templateValDict["patterns"] = strPatterns
+    templateValDict["condition"] = "any of them"
+
+    yaraOutput = yaraTemplate.render(templateValDict)
+
+    puts(colored.green("[+] YARA rules generated.\n"))
+    puts(colored.blue(yaraOutput+"\n"))
+
+    yaraFilePath = os.path.join(matchPatternDir, rulename.lower()+".yar")
+    with open(yaraFilePath, "w") as filePointer:
+        filePointer.write(yaraOutput)
+
+    puts(colored.green("[+] YARA rules generated and saved at {}.\n".format(os.path.abspath(yaraFilePath.lower()))))
+
+@click.command(context_settings=dict(show_default=True))
+@click.option('--rulename', '-r', type=click.STRING, help='Provide a rule name with no spaces and must start with letter.', required=True)
+@click.option('--filetype', '-f', type=click.Choice(['office'], case_sensitive=False), help='Select sample set file type choices.', required=True)
+@click.option('--matchpatternfile', '-m', type=click.STRING, help='Matched pattern will be saved to this file. Please provide full path eg: ./output/matched-pattern', required=False)
+@click.option('--inputfilepath', '-i', type=click.STRING, help='File or files will be read from this location eg: ./files-folder', required=False)
+@click.option('--folderdepth', '-fd', type=click.INT, help='How much depth within the inputfilepath the files will be searched. To search all files with any depth enter 0', required=False)
+@click.option('--fuzzymatch', '-fm', default=(None, None, None, None), nargs=4, type=(str,int,str,int), help='Match file patterns using fuzzy hashing. Please provide folder path of confirm virus samples with match percentage of same type and probable virus samples with should be matched percent. For eg: -fm ./confirm-sample 80 ./probable-sample 60')
+@click.option('--patternoccurance', '-o', type=click.INT, help='How many match of the pattern within the files is considered as match.', required=False)
+@click.option('--block', '-b', type=click.INT, help='File buffer size when reading file.', required=False)
+@click.option('--loglevel', '-l', default='ERROR', type=click.Choice(['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'], case_sensitive=False), help='Select log level for the application.')
+@click.option('--author', '-a', type=click.STRING, default='N/A', help='Type you name to be filled in the author field in generate YARA rule. Eg. -n "John Doe"', required=False)
+@click.option('--description', '-d', type=click.STRING, default='No Description Provided', help='Provide a useful description of the YARA rule.', required=False)
+@click.option('--tags', '-t', type=click.STRING, default='', help="Apply Tags to Yara Rule For Easy Reference (AlphaNumeric)")
+def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None, folderdepth=None, fuzzymatch=None, patternoccurance=None, block=None, loglevel=None, author=None, description=None, tags=None):
+    pattern = re.compile(r"^[A-Za-z]\S*\w*$")
+    if not pattern.match(rulename):
+        puts(colored.red(("[!] Wrong pattern for rule name.\n")))
+        sys.exit(1)
+
+    fileLoader = FileSystemLoader('templates')
+    env = Environment(loader=fileLoader)
+    yaraTemplate = env.get_template('default.yar')
+
+    try:
+        matchPatternDir, matchPatternFilePath, inputFilesPath, folderDepth, occurance, blocksize = load_config(
+            matchpatternfile, inputfilepath, folderdepth, patternoccurance, block, loglevel
+        )
+
+        if all(fuzzymatch):
+            fuzzyMatchObj = FuzzyMatch(fuzzymatch[0], fuzzymatch[1], fuzzymatch[2], fuzzymatch[3], inputFilesPath)
+            fuzzyMatchObj.searchFiles()
+
+        fileHash, tempFolder = process_files(inputFilesPath, folderDepth, blocksize)
+
+        foundPattern = 0
+        searchPatternObj = SearchPattern(tempFolder, matchPatternFilePath, occurance)
+        for file in listdir(tempFolder):
+            foundPattern += searchPatternObj.search(file)
+
+        if(foundPattern):
+            puts(colored.green(("[+] Common matched pattern saved to {}.\n".format(os.path.abspath(matchPatternFilePath)))))
+        else:
+            puts(colored.red(("[!] No matching pattern found within files.\n")))
+            if os.path.exists(matchPatternFilePath):
+                os.remove(matchPatternFilePath)
+
+        shutil.rmtree(tempFolder)
+
+        if(foundPattern):
+            generate_yara_rule(rulename, tags, author, description, fileHash, matchPatternFilePath, matchPatternDir, blocksize, yaraTemplate)
+
+        puts(colored.yellow("[*] Good BYE. Be Secured.\n"))
+    except Exception as error:
+        puts(colored.red("[!] Error executing application.\n"))
+        logging.exception(error)
+        sys.exit(1)
+    except OSError as error:
+        puts(colored.red("[!] Error executing application.\n"))
+        logging.exception(error)
+        sys.exit(1)
+    except KeyboardInterrupt:
+        puts(colored.red("[!] Application Interrupted.\n"))
+        sys.exit(1)
+
+if __name__ == '__main__':
+    puts(colored.red(r"""
+                     ,
+                ,.  | \
+               |: \ ; :\
+               :' ;\| ::\
+                \ : | `::\
+                _)  |   `:`.
+              ,' , `.    ;: ;
+            ,' ;:  ;"'  ,:: |_
+           /,   ` .    ;::: |:`-.__
+        _,' _o\  ,::.`:' ;  ;   . '
+    _,-'           `:.          ;""\,
+ ,-'                     ,:         `-;,
+ \,                       ;:           ;--._
+  `.______,-,----._     ,' ;:        ,/ ,  ,`
+         / /,-';'  \     ; `:      ,'/,::.:::
+       ,',;-'-'_,--;    ;   :.   ,',',;::::::
+      ( /___,-'     `.     ;::,,'o/  ,:::::::
+       `'             )    ;:,'o /  ;"-   -::
+                      \__ _,'o ,'         ,::
+                         ) `--'       ,..::::
+                         ; `.        ,:::::::
+                          ;  ``::.    :::::::
+    """))
+
+    f = Figlet(font='slant')
+    puts(colored.blue(f.renderText("Yara Silly Silly")))
+    puts(colored.green("""
+------------------------------------------------------------------------
+Yara Silly Silly automatically generates YARA rules for you.
+Thank you for using the application
+Source code can be found at
+https://github.com/YARA-Silly-Silly/yarasilly2
+Maintained by:-
+Krishnendu Paul and Himadri Ganguly
+------------------------------------------------------------------------
+    """))
+
+    main()
