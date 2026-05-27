@@ -33,7 +33,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
     logLevelDict = {'CRITICAL': logging.CRITICAL, 'ERROR': logging.ERROR, 'WARNING': logging.WARNING, 'INFO': logging.INFO, 'DEBUG': logging.DEBUG}
     foundPattern = 0
 
-    pattern = re.compile(r"^[A-Za-z]\S*\w*$")
+    pattern = re.compile(r"^[A-Za-z]\w*$")
     if not pattern.match(rulename):
         puts(colored.red(("[!] Wrong pattern for rule name.\n")))
         sys.exit(1)
