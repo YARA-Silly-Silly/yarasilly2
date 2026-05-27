@@ -5,6 +5,8 @@ from tqdm import tqdm
 from pkgs.utils import md5sum
 from pkgs.utils import splitDirFileName
 
+_URL_REGEX = re.compile(r'(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I)
+
 class StringDump:
     def __init__(self, dirPath, fileType, tempFolder, blocksize=8192):
         self.dirPath = dirPath
@@ -13,24 +15,24 @@ class StringDump:
         self.blocksize = blocksize
 
     def __linkSearch(self, attachment):
-        urls = list(set(re.compile(r'(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I).findall(attachment)))
+        urls = list(set(_URL_REGEX.findall(attachment)))
         return urls
 
     def __getStrings(self, filePath):
         allStrings = []
         filePointer = open(filePath,'rb')
+        chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
+        regexp = '[%s]{%d,100}' % (chars, 6)
+        pattern = re.compile(regexp)
+        unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
         while True:
             data = filePointer.read(self.blocksize).decode('ISO-8859-1')
             if not data:
                 break
-            chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
-            regexp = '[%s]{%d,100}' % (chars, 6)
-            pattern = re.compile(regexp)
             strlist = pattern.findall(data)
             if len(strlist)>0:
                 allStrings.append(strlist)
             #Get Wide Strings
-            unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
             unicodelist = list(set(unicode_str.findall(data)))
             if len(unicodelist)>0:
                 allStrings.append(unicodelist)
@@ -63,8 +65,8 @@ class StringDump:
         #Match Against Regex Blacklist
         regmatchList = []
         for regblack in regBlackList:
+            regex = re.compile(regblack)
             for str in finalStringList:
-                regex = re.compile(regblack)
                 if regex.search(str): regmatchList.append(str)
         if len(regmatchList) > 0:
             for match in list(set(regmatchList)):
