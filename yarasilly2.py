@@ -15,6 +15,12 @@ from pkgs.findfiles import FindFiles
 from pkgs.searchpattern import SearchPattern
 from pkgs.stringdump import StringDump
 
+def sanitize_input(val):
+    if not isinstance(val, str):
+        return val
+    return val.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '').replace('\r', '')
+
+
 @click.command(context_settings=dict(show_default=True))
 @click.option('--rulename', '-r', type=click.STRING, help='Provide a rule name with no spaces and must start with letter.', required=True)
 @click.option('--filetype', '-f', type=click.Choice(['office'], case_sensitive=False), help='Select sample set file type choices.', required=True)
@@ -112,11 +118,11 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
 
         if(foundPattern):
             templateValDict = {
-                "ruleName": rulename,
-                "ruleTag": tags,
-                "authorName": author,
+                "ruleName": sanitize_input(rulename),
+                "ruleTag": sanitize_input(tags),
+                "authorName": sanitize_input(author),
                 "date": datetime.now().strftime("%Y-%m-%d"),
-                "desc": description,
+                "desc": sanitize_input(description),
                 "hashArray": fileHash,
                 "fileType": "office"
             }
