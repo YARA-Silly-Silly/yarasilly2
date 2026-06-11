@@ -12,6 +12,11 @@ class StringDump:
         self.tempFolder = tempFolder
         self.blocksize = blocksize
 
+        with open(self.dirPath +'/modules/'+self.fileType+'_blacklist') as f:
+            self.blackList = f.read().splitlines()
+        with open(self.dirPath +'/modules/'+self.fileType+'_regexblacklist') as f:
+            self.regBlackList = f.read().splitlines()
+
     def __linkSearch(self, attachment):
         urls = list(set(re.compile(r'(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I).findall(attachment)))
         return urls
@@ -52,17 +57,12 @@ class StringDump:
             for str in stringArray:
                 finalStringList.append(str.strip())
 
-        with open(self.dirPath +'/modules/'+self.fileType+'_blacklist') as f:
-            blackList = f.read().splitlines()
-        with open(self.dirPath +'/modules/'+self.fileType+'_regexblacklist') as f:
-            regBlackList = f.read().splitlines()
-
         #Match Against Blacklist
-        for black in blackList:
+        for black in self.blackList:
             if black in finalStringList: finalStringList.remove(black)
         #Match Against Regex Blacklist
         regmatchList = []
-        for regblack in regBlackList:
+        for regblack in self.regBlackList:
             for str in finalStringList:
                 regex = re.compile(regblack)
                 if regex.search(str): regmatchList.append(str)
