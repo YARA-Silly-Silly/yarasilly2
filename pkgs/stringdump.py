@@ -2,7 +2,7 @@ import re, sys, os
 from clint.textui import puts, colored
 from tqdm import tqdm
 
-from pkgs.utils import md5sum
+from pkgs.utils import sha256sum
 from pkgs.utils import splitDirFileName
 
 class StringDump:
@@ -43,7 +43,7 @@ class StringDump:
         if len(allStrings) > 0:
             return allStrings
         else:
-          puts(colored.red('[!] No Extractable Attributes Present in\nFile: {}\nHash: {}\nPlease Remove it from the Sample Set and Try Again!'.format(filePath,md5sum(filePath))))
+          puts(colored.red('[!] No Extractable Attributes Present in\nFile: {}\nHash: {}\nPlease Remove it from the Sample Set and Try Again!'.format(filePath,sha256sum(filePath))))
           sys.exit(1)
 
     def __removeBlackListStrings(self, allStrings):
