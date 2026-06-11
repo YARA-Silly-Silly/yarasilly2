@@ -58,17 +58,11 @@ class StringDump:
             regBlackList = f.read().splitlines()
 
         #Match Against Blacklist
-        for black in blackList:
-            if black in finalStringList: finalStringList.remove(black)
+        blackSet = set(blackList)
+        finalStringList = [s for s in finalStringList if s not in blackSet]
         #Match Against Regex Blacklist
-        regmatchList = []
-        for regblack in regBlackList:
-            for str in finalStringList:
-                regex = re.compile(regblack)
-                if regex.search(str): regmatchList.append(str)
-        if len(regmatchList) > 0:
-            for match in list(set(regmatchList)):
-                finalStringList.remove(match)
+        compiledRegexes = [re.compile(regblack) for regblack in regBlackList]
+        finalStringList = [s for s in finalStringList if not any(regex.search(s) for regex in compiledRegexes)]
         return finalStringList
 
     def dumpStringsToTempFile(self, filePath):
