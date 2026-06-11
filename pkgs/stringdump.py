@@ -1,6 +1,5 @@
 import re, sys, os
 from clint.textui import puts, colored
-from tqdm import tqdm
 
 from pkgs.utils import md5sum
 from pkgs.utils import splitDirFileName
