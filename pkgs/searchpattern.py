@@ -68,4 +68,3 @@ class SearchPattern:
             return(self.foundPattern)
         except Exception as error:
             raise Exception(error)
-            sys.exit(1)
