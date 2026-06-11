@@ -1,7 +1,7 @@
 import pytest
 import os
 import tempfile
-from pkgs.utils import splitDirFileName, md5sum, listdir
+from pkgs.utils import splitDirFileName, sha256sum, listdir
 
 def test_splitDirFileName():
     path = "/path/to/my/file.txt"
@@ -9,13 +9,13 @@ def test_splitDirFileName():
     assert dir_name == "/path/to/my"
     assert file_name == "file.txt"
 
-def test_md5sum():
+def test_sha256sum():
     with tempfile.NamedTemporaryFile(delete=False) as f:
         f.write(b"hello world")
         temp_path = f.name
 
-    # md5 of "hello world" is 5eb63bbbe01eeed093cb22bb8f5acdc3
-    assert md5sum(temp_path) == "5eb63bbbe01eeed093cb22bb8f5acdc3"
+    # sha256 of "hello world" is b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+    assert sha256sum(temp_path) == "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
     os.remove(temp_path)
 
 def test_listdir():

@@ -5,7 +5,7 @@ from tqdm import tqdm
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
-from pkgs.utils import md5sum, listdir
+from pkgs.utils import sha256sum, listdir
 
 # sys.path.append('./libs')
 
@@ -91,7 +91,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
 
         stringDumpObj = StringDump(dirPath, 'office', tempFolder, blocksize)
         for file in findFilesObj.searchFiles():
-            fileHash.append(md5sum(file))
+            fileHash.append(sha256sum(file))
             stringDumpObj.dumpStringsToTempFile(file)
 
         del findFilesObj
