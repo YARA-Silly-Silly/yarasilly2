@@ -25,16 +25,17 @@ class SearchPattern:
     def __checkIfStringInFile(self, file, stringToSearch):
         count = 1
 
-        for fileCmp in listdir(self.tempFolder):
+        if not hasattr(self, '_file_cache'):
+            self._file_cache = {}
+            for fileCmp in listdir(self.tempFolder):
+                with open(fileCmp, 'r') as filePointer:
+                    self._file_cache[fileCmp] = set(filePointer.read().splitlines())
+
+        for fileCmp, lines_set in self._file_cache.items():
             if fileCmp == file:
                 continue
-            with open(fileCmp, 'r') as filePointer:
-                buf = 1
-                while (buf):
-                    buf = filePointer.read(self.blocksize).splitlines()
-                    if stringToSearch in buf:
-                        count+=1
-            filePointer.close()
+            if stringToSearch in lines_set:
+                count += 1
         return count
 
     def search(self, file):
