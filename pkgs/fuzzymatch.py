@@ -69,6 +69,5 @@ class FuzzyMatch:
                                 shutil.copy(traverseFilePath, self.inputFilesPath)
                                 break
             print("\n")
-        except Exception as error:
-            raise Exception(error)
-            sys.exit(1)
+        except Exception:
+            raise

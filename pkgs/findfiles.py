@@ -37,6 +37,5 @@ class FindFiles:
                     yield filePath
             print("\n")
 
-        except Exception as error:
-            raise Exception(error)
-            sys.exit(1)
+        except Exception:
+            raise
