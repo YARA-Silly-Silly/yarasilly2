@@ -87,4 +87,3 @@ class StringDump:
 
         except Exception as error:
             raise Exception(error)
-            sys.exit(1)
