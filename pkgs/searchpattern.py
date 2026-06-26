@@ -11,15 +11,12 @@ class SearchPattern:
         self.matchPatternFilePath = matchPatternFilePath
         self.occurance = occurance
         self.blocksize = blocksize
+        self.seen_patterns = set()
 
     def __checkPatternPresent(self, writeFilePointer, stringPattern):
-        writeFilePointer.seek(0)
-        while True:
-            buf = writeFilePointer.readline()
-            if not buf:
-                break
-            elif buf and stringPattern in buf.split("-",1)[1]:
-                return False
+        if stringPattern in self.seen_patterns:
+            return False
+        self.seen_patterns.add(stringPattern)
         return True
 
     def __checkIfStringInFile(self, file, stringToSearch):
