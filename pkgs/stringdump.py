@@ -11,26 +11,27 @@ class StringDump:
         self.fileType = fileType
         self.tempFolder = tempFolder
         self.blocksize = blocksize
+        self._url_pattern = re.compile(r'(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I)
 
     def __linkSearch(self, attachment):
-        urls = list(set(re.compile(r'(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I).findall(attachment)))
+        urls = list(set(self._url_pattern.findall(attachment)))
         return urls
 
     def __getStrings(self, filePath):
         allStrings = []
         filePointer = open(filePath,'rb')
+        chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
+        regexp = '[%s]{%d,100}' % (chars, 6)
+        pattern = re.compile(regexp)
+        unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
         while True:
             data = filePointer.read(self.blocksize).decode('ISO-8859-1')
             if not data:
                 break
-            chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
-            regexp = '[%s]{%d,100}' % (chars, 6)
-            pattern = re.compile(regexp)
             strlist = pattern.findall(data)
             if len(strlist)>0:
                 allStrings.append(strlist)
             #Get Wide Strings
-            unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
             unicodelist = list(set(unicode_str.findall(data)))
             if len(unicodelist)>0:
                 allStrings.append(unicodelist)
