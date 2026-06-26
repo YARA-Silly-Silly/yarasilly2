@@ -72,19 +72,14 @@ class StringDump:
         return finalStringList
 
     def dumpStringsToTempFile(self, filePath):
-        try:
-            finalStringList = self.__removeBlackListStrings(self.__getStrings(filePath))
+        finalStringList = self.__removeBlackListStrings(self.__getStrings(filePath))
 
-            if not os.path.exists(self.tempFolder):
-                os.makedirs(self.tempFolder)
+        if not os.path.exists(self.tempFolder):
+            os.makedirs(self.tempFolder)
 
-            fileName = splitDirFileName(filePath)[1]
-            tempFile = os.path.join(self.tempFolder,fileName.replace(".","-"))
-            with open(tempFile, 'w') as filePointer:
-                for str in finalStringList:
-                    filePointer.write(str+"\n")
-            filePointer.close()
-
-        except Exception as error:
-            raise Exception(error)
-            sys.exit(1)
+        fileName = splitDirFileName(filePath)[1]
+        tempFile = os.path.join(self.tempFolder,fileName.replace(".","-"))
+        with open(tempFile, 'w') as filePointer:
+            for str in finalStringList:
+                filePointer.write(str+"\n")
+        filePointer.close()
