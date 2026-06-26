@@ -25,18 +25,14 @@ class FindFiles:
                         yield os.path.join(dirpath, filename)
 
     def searchFiles(self):
-        try:
-            # Preprocess the total files count
-            fileCounter = 0
+        # Preprocess the total files count
+        fileCounter = 0
+        for filePath in self.__walk(self.inputFilesPath, self.folderDepth):
+            fileCounter += 1
+        with tqdm(total=fileCounter, unit="files", desc="Searching Files And Dumping Strings: ") as pbar:
             for filePath in self.__walk(self.inputFilesPath, self.folderDepth):
-                fileCounter += 1
-            with tqdm(total=fileCounter, unit="files", desc="Searching Files And Dumping Strings: ") as pbar:
-                for filePath in self.__walk(self.inputFilesPath, self.folderDepth):
-                    pbar.update(1)
-                    pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
-                    yield filePath
-            print("\n")
+                pbar.update(1)
+                pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
+                yield filePath
+        print("\n")
 
-        except Exception as error:
-            raise Exception(error)
-            sys.exit(1)
