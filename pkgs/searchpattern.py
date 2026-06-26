@@ -11,6 +11,21 @@ class SearchPattern:
         self.matchPatternFilePath = matchPatternFilePath
         self.occurance = occurance
         self.blocksize = blocksize
+        self._file_contents = {}
+
+    def _preload_files(self):
+        self._file_contents = {}
+        for f in listdir(self.tempFolder):
+            with open(f, 'r') as fp:
+                # We read it all at once since we just need to check if a string is present
+                # Reading block-by-block and splitting lines as before, but caching it
+                content = set()
+                buf = 1
+                while buf:
+                    buf = fp.read(self.blocksize).splitlines()
+                    if buf:
+                        content.update(buf)
+                self._file_contents[f] = content
 
     def __checkPatternPresent(self, writeFilePointer, stringPattern):
         writeFilePointer.seek(0)
@@ -25,20 +40,16 @@ class SearchPattern:
     def __checkIfStringInFile(self, file, stringToSearch):
         count = 1
 
-        for fileCmp in listdir(self.tempFolder):
+        for fileCmp, contents in self._file_contents.items():
             if fileCmp == file:
                 continue
-            with open(fileCmp, 'r') as filePointer:
-                buf = 1
-                while (buf):
-                    buf = filePointer.read(self.blocksize).splitlines()
-                    if stringToSearch in buf:
-                        count+=1
-            filePointer.close()
+            if stringToSearch in contents:
+                count += 1
         return count
 
     def search(self, file):
         try:
+            self._preload_files()
             # Preprocess the total file size
             sizeCounter = os.stat(file).st_size
 
