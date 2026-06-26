@@ -6,9 +6,6 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
 from pkgs.utils import md5sum, listdir
-
-# sys.path.append('./libs')
-
 from pkgs.utils import splitDirFileName
 from pkgs.fuzzymatch import FuzzyMatch
 from pkgs.findfiles import FindFiles
