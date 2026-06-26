@@ -26,12 +26,11 @@ class FindFiles:
 
     def searchFiles(self):
         try:
-            # Preprocess the total files count
-            fileCounter = 0
-            for filePath in self.__walk(self.inputFilesPath, self.folderDepth):
-                fileCounter += 1
+            # Preprocess the total files count and store file paths to avoid a second walk
+            filePaths = list(self.__walk(self.inputFilesPath, self.folderDepth))
+            fileCounter = len(filePaths)
             with tqdm(total=fileCounter, unit="files", desc="Searching Files And Dumping Strings: ") as pbar:
-                for filePath in self.__walk(self.inputFilesPath, self.folderDepth):
+                for filePath in filePaths:
                     pbar.update(1)
                     pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
                     yield filePath
