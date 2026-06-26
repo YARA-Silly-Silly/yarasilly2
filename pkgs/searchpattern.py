@@ -66,6 +66,5 @@ class SearchPattern:
             writeFilePointer.close()
             print("\n")
             return(self.foundPattern)
-        except Exception as error:
-            raise Exception(error)
-            sys.exit(1)
+        except Exception:
+            raise
