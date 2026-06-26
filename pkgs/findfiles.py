@@ -1,4 +1,4 @@
-import os, time
+import os
 from tqdm import tqdm
 
 from pkgs.utils import listdir
@@ -39,4 +39,3 @@ class FindFiles:
 
         except Exception as error:
             raise Exception(error)
-            sys.exit(1)
