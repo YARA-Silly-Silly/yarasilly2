@@ -38,7 +38,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
         sys.exit(1)
 
     fileLoader = FileSystemLoader('templates')
-    env = Environment(loader=fileLoader)
+    env = Environment(loader=fileLoader, autoescape=False) # nosec B701
     yaraTemplate = env.get_template('default.yar')
 
     try:
@@ -109,13 +109,19 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
 
         shutil.rmtree(tempFolder)
 
+        # Sanitize user inputs to prevent template injection
+        def sanitize(s):
+            if not s:
+                return s
+            return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', ' ').replace('\r', ' ')
+
         if(foundPattern):
             templateValDict = {
-                "ruleName": rulename,
-                "ruleTag": tags,
-                "authorName": author,
+                "ruleName": rulename, # Rule name already regex-checked
+                "ruleTag": sanitize(tags),
+                "authorName": sanitize(author),
                 "date": datetime.now().strftime("%Y-%m-%d"),
-                "desc": description,
+                "desc": sanitize(description),
                 "hashArray": fileHash,
                 "fileType": "office"
             }
