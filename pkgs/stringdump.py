@@ -62,8 +62,8 @@ class StringDump:
         #Match Against Regex Blacklist
         regmatchList = []
         for regblack in regBlackList:
+            regex = re.compile(regblack)
             for str in finalStringList:
-                regex = re.compile(regblack)
                 if regex.search(str): regmatchList.append(str)
         if len(regmatchList) > 0:
             for match in list(set(regmatchList)):
