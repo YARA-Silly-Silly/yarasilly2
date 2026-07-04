@@ -41,3 +41,19 @@ def test_searchpattern_no_match():
         result = sp.search(file1)
 
         assert result == 0
+
+def test_check_pattern_present():
+    import io
+    sp = SearchPattern(None, None)
+
+    # Pattern is present
+    f1 = io.StringIO("2-test_string\n5-another_pattern\n")
+    assert sp._SearchPattern__checkPatternPresent(f1, "test_string") is False
+
+    # Pattern is not present
+    f2 = io.StringIO("2-some_string\n5-another_pattern\n")
+    assert sp._SearchPattern__checkPatternPresent(f2, "test_string") is True
+
+    # Empty file
+    f3 = io.StringIO("")
+    assert sp._SearchPattern__checkPatternPresent(f3, "test_string") is True
