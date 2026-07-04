@@ -84,9 +84,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
 
         fileHash = []
         dirPath = os.path.dirname(os.path.abspath(__file__))
-        tempFolder = os.path.join(tempfile.gettempdir(), "yara-silly-silly")
-        if not os.path.exists(tempFolder):
-            os.makedirs(tempFolder)
+        tempFolder = tempfile.mkdtemp(prefix="yara-silly-silly-")
 
         stringDumpObj = StringDump(dirPath, 'office', tempFolder, blocksize)
         for file in findFilesObj.searchFiles():
