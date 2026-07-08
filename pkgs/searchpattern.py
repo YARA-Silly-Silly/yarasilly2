@@ -12,6 +12,7 @@ class SearchPattern:
         self.occurance = occurance
         self.blocksize = blocksize
         self._file_contents = {}
+        self._preloaded = False
 
     def _preload_files(self):
         self._file_contents = {}
@@ -38,6 +39,10 @@ class SearchPattern:
         return True
 
     def __checkIfStringInFile(self, file, stringToSearch):
+        if not self._preloaded:
+            self._preload_files()
+            self._preloaded = True
+
         count = 1
 
         for fileCmp, contents in self._file_contents.items():
@@ -48,6 +53,10 @@ class SearchPattern:
         return count
 
     def search(self, file):
+        if not self._preloaded:
+            self._preload_files()
+            self._preloaded = True
+
         # Preprocess the total file size
         sizeCounter = os.stat(file).st_size
 

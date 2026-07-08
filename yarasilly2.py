@@ -35,7 +35,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
         sys.exit(1)
 
     fileLoader = FileSystemLoader('templates')
-    env = Environment(loader=fileLoader, autoescape=False) # nosec B701
+    env = Environment(loader=fileLoader, autoescape=True)
     yaraTemplate = env.get_template('default.yar')
 
     try:
@@ -128,11 +128,11 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
                     if not buf:
                         break
                     if "\x00" in buf:
-                        str = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"').replace("\x00","") + "\" wide"
-                        strPatterns.append(str)
+                        pattern_string = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"').replace("\x00","") + "\" wide"
+                        strPatterns.append(pattern_string)
                     else:
-                        str = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"') + "\""
-                        strPatterns.append(str)
+                        pattern_string = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"') + "\""
+                        strPatterns.append(pattern_string)
 
             templateValDict["patterns"] = strPatterns
             templateValDict["condition"] = "any of them"
