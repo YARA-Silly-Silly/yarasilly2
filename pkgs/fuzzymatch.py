@@ -25,18 +25,17 @@ class FuzzyMatch:
         refHash = ppdeep.hash_from_file(filePath)
         print("Fuzzy Hash Of Reference File: {}\n".format(refHash))
         # Preprocess the total files count
-        fileCounter = 0
-        for filePath in listdir(self.confirmPath):
-            fileCounter += 1
+        confirm_files = list(listdir(self.confirmPath))
+        fileCounter = len(confirm_files)
 
         if fileCounter == 1:
             self.confirmPathFileHash.append(refHash)
-            shutil.copy(filePath, self.inputFilesPath)
+            shutil.copy(confirm_files[0], self.inputFilesPath)
         else:
             with tqdm(total=fileCounter, unit="files", desc="Fuzzy find in confirm path: ") as pbar:
-                for traverseFilePath in listdir(self.confirmPath):
+                for traverseFilePath in confirm_files:
                     pbar.update(1)
-                    pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
+                    pbar.set_postfix(file=traverseFilePath.split(os.path.sep)[-1:])
                     if filePath == traverseFilePath:
                         self.confirmPathFileHash.append(refHash)
                         shutil.copy(traverseFilePath, self.inputFilesPath)
@@ -50,17 +49,16 @@ class FuzzyMatch:
                         shutil.copy(traverseFilePath, self.probablePath)
         print("\n")
 
-        fileCounter = 0
-        for filePath in listdir(self.probablePath):
-            fileCounter += 1
+        probable_files = list(listdir(self.probablePath))
+        fileCounter = len(probable_files)
 
         if fileCounter == 0:
             raise Exception("Empty probable virus sample folder.")
         else:
             with tqdm(total=fileCounter, unit="files", desc="Fuzzy find in probable path: ") as pbar:
-                for traverseFilePath in listdir(self.probablePath):
+                for traverseFilePath in probable_files:
                     pbar.update(1)
-                    pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
+                    pbar.set_postfix(file=traverseFilePath.split(os.path.sep)[-1:])
                     tmpHash = ppdeep.hash_from_file(traverseFilePath)
                     for fileHash in self.confirmPathFileHash:
                         # print("File: ", traverseFilePath, " - ", ppdeep.compare(refHash, tmpHash))
