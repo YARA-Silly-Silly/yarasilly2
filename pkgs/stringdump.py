@@ -60,14 +60,8 @@ class StringDump:
         #Match Against Blacklist
         finalStringList = list(set(finalStringList) - set(blackList))
         #Match Against Regex Blacklist
-        regmatchList = []
-        for regblack in regBlackList:
-            regex = re.compile(regblack)
-            for str in finalStringList:
-                if regex.search(str): regmatchList.append(str)
-        if len(regmatchList) > 0:
-            for match in list(set(regmatchList)):
-                finalStringList.remove(match)
+        compiled_regexes = [re.compile(regblack) for regblack in regBlackList]
+        finalStringList = [s for s in finalStringList if not any(regex.search(s) for regex in compiled_regexes)]
         return finalStringList
 
     def dumpStringsToTempFile(self, filePath):
