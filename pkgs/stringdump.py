@@ -5,12 +5,32 @@ from pkgs.utils import md5sum
 from pkgs.utils import splitDirFileName
 
 class StringDump:
+    _blacklist_cache = {}
+    _regexblacklist_cache = {}
+
     def __init__(self, dirPath, fileType, tempFolder, blocksize=8192):
         self.dirPath = dirPath
         self.fileType = fileType
         self.tempFolder = tempFolder
         self.blocksize = blocksize
         self._url_pattern = re.compile(r'(?:ftp|http)[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I)
+
+        # Load and cache blacklists
+        cache_key = (self.dirPath, self.fileType)
+        if cache_key not in self._blacklist_cache:
+            try:
+                with open(os.path.join(self.dirPath, 'modules', self.fileType + '_blacklist')) as f:
+                    self._blacklist_cache[cache_key] = set(f.read().splitlines())
+            except FileNotFoundError:
+                self._blacklist_cache[cache_key] = set()
+
+        if cache_key not in self._regexblacklist_cache:
+            try:
+                with open(os.path.join(self.dirPath, 'modules', self.fileType + '_regexblacklist')) as f:
+                    regBlackList = f.read().splitlines()
+                    self._regexblacklist_cache[cache_key] = [re.compile(reg) for reg in regBlackList]
+            except FileNotFoundError:
+                self._regexblacklist_cache[cache_key] = []
 
     def __linkSearch(self, attachment):
         urls = list(set(self._url_pattern.findall(attachment)))
@@ -52,17 +72,15 @@ class StringDump:
             for str in stringArray:
                 finalStringList.append(str.strip())
 
-        with open(self.dirPath +'/modules/'+self.fileType+'_blacklist') as f:
-            blackList = f.read().splitlines()
-        with open(self.dirPath +'/modules/'+self.fileType+'_regexblacklist') as f:
-            regBlackList = f.read().splitlines()
+        cache_key = (self.dirPath, self.fileType)
+        blackListSet = self._blacklist_cache.get(cache_key, set())
+        regexList = self._regexblacklist_cache.get(cache_key, [])
 
         #Match Against Blacklist
-        finalStringList = list(set(finalStringList) - set(blackList))
+        finalStringList = list(set(finalStringList) - blackListSet)
         #Match Against Regex Blacklist
         regmatchList = []
-        for regblack in regBlackList:
-            regex = re.compile(regblack)
+        for regex in regexList:
             for str in finalStringList:
                 if regex.search(str): regmatchList.append(str)
         if len(regmatchList) > 0:
