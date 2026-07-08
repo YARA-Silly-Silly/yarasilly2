@@ -128,11 +128,11 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
                     if not buf:
                         break
                     if "\x00" in buf:
-                        str = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"').replace("\x00","") + "\" wide"
-                        strPatterns.append(str)
+                        pattern_str = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"').replace("\x00","") + "\" wide"
+                        strPatterns.append(pattern_str)
                     else:
-                        str = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"') + "\""
-                        strPatterns.append(str)
+                        pattern_str = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"') + "\""
+                        strPatterns.append(pattern_str)
 
             templateValDict["patterns"] = strPatterns
             templateValDict["condition"] = "any of them"
