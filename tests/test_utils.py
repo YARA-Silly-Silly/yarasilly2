@@ -18,6 +18,10 @@ def test_md5sum():
     assert md5sum(temp_path) == "5eb63bbbe01eeed093cb22bb8f5acdc3"
     os.remove(temp_path)
 
+def test_md5sum_file_not_found():
+    with pytest.raises(FileNotFoundError):
+        md5sum("non_existent_file.txt")
+
 def test_listdir():
     with tempfile.TemporaryDirectory() as tmpdirname:
         # Create some files
