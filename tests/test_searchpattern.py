@@ -3,6 +3,37 @@ import os
 import tempfile
 from pkgs.searchpattern import SearchPattern
 
+def test_preload_files(mocker):
+    with tempfile.TemporaryDirectory() as tempFolder:
+        # Create dummy files
+        file1 = os.path.join(tempFolder, "file1")
+        with open(file1, 'w') as f:
+            f.write("line1\nline2\nline3")
+
+        file2 = os.path.join(tempFolder, "file2")
+        with open(file2, 'w') as f:
+            f.write("line4\nline5")
+
+        file3 = os.path.join(tempFolder, "file3")
+        with open(file3, 'w') as f:
+            f.write("") # Empty file
+
+        # The actual function uses utils.listdir which returns absolute paths. We just need to ensure
+        # that os.listdir or whatever is mocked correctly or test directory works correctly.
+        # Actually searchpattern's listdir uses scandir yielding path, which is full path.
+        sp = SearchPattern(tempFolder, "dummy_pattern.txt")
+        sp._preload_files()
+
+        assert file1 in sp._file_contents
+        assert file2 in sp._file_contents
+        assert file3 in sp._file_contents
+
+        # Verify the sets have the correct elements
+        assert {"line1", "line2", "line3"} == sp._file_contents[file1]
+        assert {"line4", "line5"} == sp._file_contents[file2]
+        assert set() == sp._file_contents[file3]
+
+
 def test_searchpattern_match():
     with tempfile.TemporaryDirectory() as tempFolder:
         # Create matched pattern file
@@ -18,6 +49,7 @@ def test_searchpattern_match():
             f.write("test_string\nanother_string\n")
 
         sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
         result = sp.search(file1)
 
         assert result == 1
@@ -38,6 +70,7 @@ def test_searchpattern_no_match():
             f.write("another_string\nyet_another\n")
 
         sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
         result = sp.search(file1)
 
         assert result == 0
@@ -68,6 +101,7 @@ def test_checkIfStringInFile():
             f.write("common_string\ncommon_string\ncommon_string\n")
 
         sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
 
         # Test finding "common_string"
         # It starts with count = 1.
