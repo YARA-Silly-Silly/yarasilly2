@@ -68,6 +68,7 @@ def test_checkIfStringInFile():
             f.write("common_string\ncommon_string\ncommon_string\n")
 
         sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
 
         # Test finding "common_string"
         # It starts with count = 1.
