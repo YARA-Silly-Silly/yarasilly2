@@ -5,6 +5,11 @@ from pkgs.utils import md5sum
 from pkgs.utils import splitDirFileName
 
 class StringDump:
+    _chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
+    _regexp = '[%s]{%d,100}' % (_chars, 6)
+    _pattern = re.compile(_regexp)
+    _unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
+
     def __init__(self, dirPath, fileType, tempFolder, blocksize=8192):
         self.dirPath = dirPath
         self.fileType = fileType
@@ -19,19 +24,15 @@ class StringDump:
     def __getStrings(self, filePath):
         allStrings = []
         filePointer = open(filePath,'rb')
-        chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
-        regexp = '[%s]{%d,100}' % (chars, 6)
-        pattern = re.compile(regexp)
-        unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
         while True:
             data = filePointer.read(self.blocksize).decode('ISO-8859-1')
             if not data:
                 break
-            strlist = pattern.findall(data)
+            strlist = self._pattern.findall(data)
             if len(strlist)>0:
                 allStrings.append(strlist)
             #Get Wide Strings
-            unicodelist = list(set(unicode_str.findall(data)))
+            unicodelist = list(set(self._unicode_str.findall(data)))
             if len(unicodelist)>0:
                 allStrings.append(unicodelist)
             #Extract URLs if present
@@ -49,8 +50,8 @@ class StringDump:
     def __removeBlackListStrings(self, allStrings):
         finalStringList = []
         for stringArray in allStrings:
-            for str in stringArray:
-                finalStringList.append(str.strip())
+            for s in stringArray:
+                finalStringList.append(s.strip())
 
         with open(self.dirPath +'/modules/'+self.fileType+'_blacklist') as f:
             blackList = f.read().splitlines()
@@ -63,8 +64,8 @@ class StringDump:
         regmatchList = []
         for regblack in regBlackList:
             regex = re.compile(regblack)
-            for str in finalStringList:
-                if regex.search(str): regmatchList.append(str)
+            for s in finalStringList:
+                if regex.search(s): regmatchList.append(s)
         if len(regmatchList) > 0:
             for match in list(set(regmatchList)):
                 finalStringList.remove(match)
@@ -79,6 +80,6 @@ class StringDump:
         fileName = splitDirFileName(filePath)[1]
         tempFile = os.path.join(self.tempFolder,fileName.replace(".","-"))
         with open(tempFile, 'w') as filePointer:
-            for str in finalStringList:
-                filePointer.write(str+"\n")
+            for s in finalStringList:
+                filePointer.write(s+"\n")
         filePointer.close()
