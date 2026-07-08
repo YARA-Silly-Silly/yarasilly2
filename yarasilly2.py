@@ -93,6 +93,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
         del dirPath
 
         searchPatternObj = SearchPattern(tempFolder, matchPatternFilePath, occurance)
+        searchPatternObj._preload_files()
         for file in listdir(tempFolder):
             foundPattern += searchPatternObj.search(file)
 
@@ -106,9 +107,10 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
 
         # Sanitize user inputs to prevent template injection
         def sanitize(s):
+            import builtins
             if not s:
                 return s
-            return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', ' ').replace('\r', ' ')
+            return builtins.str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', ' ').replace('\r', ' ')
 
         if(foundPattern):
             templateValDict = {

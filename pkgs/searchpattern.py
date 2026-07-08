@@ -12,6 +12,7 @@ class SearchPattern:
         self.occurance = occurance
         self.blocksize = blocksize
         self._file_contents = {}
+        self._written_patterns = set()
 
     def _preload_files(self):
         self._file_contents = {}
@@ -27,14 +28,9 @@ class SearchPattern:
                         content.update(buf)
                 self._file_contents[f] = content
 
-    def __checkPatternPresent(self, writeFilePointer, stringPattern):
-        writeFilePointer.seek(0)
-        while True:
-            buf = writeFilePointer.readline()
-            if not buf:
-                break
-            elif buf and stringPattern in buf.split("-",1)[1]:
-                return False
+    def __checkPatternPresent(self, stringPattern):
+        if stringPattern in self._written_patterns:
+            return False
         return True
 
     def __checkIfStringInFile(self, file, stringToSearch):
@@ -62,12 +58,13 @@ class SearchPattern:
                     for stringPattern in buf.splitlines():
                         if not stringPattern.strip():
                             continue
-                        if self.__checkPatternPresent(writeFilePointer, stringPattern):
+                        if self.__checkPatternPresent(stringPattern):
                             match = self.__checkIfStringInFile(file, stringPattern)
                             if match>=self.occurance:
                                 self.foundPattern = 1
                                 writeFilePointer.seek(0, 2)
                                 writeFilePointer.write(str(match) + "-" + stringPattern.strip() + "\n")
+                                self._written_patterns.add(stringPattern)
                     if buf:
                         pbar.set_postfix(file=file)
                         pbar.update(len(buf))
