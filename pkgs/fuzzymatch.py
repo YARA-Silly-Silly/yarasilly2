@@ -42,7 +42,6 @@ class FuzzyMatch:
                         shutil.copy(traverseFilePath, self.inputFilesPath)
                         continue
                     tmpHash = ppdeep.hash_from_file(traverseFilePath)
-                    # print("File: ", traverseFilePath, " - ", ppdeep.compare(refHash, tmpHash))
                     if ppdeep.compare(refHash, tmpHash) >= self.confirmFilesPercent:
                         self.confirmPathFileHash.append(tmpHash)
                         shutil.copy(traverseFilePath, self.inputFilesPath)
@@ -63,7 +62,6 @@ class FuzzyMatch:
                     pbar.set_postfix(file=filePath.split(os.path.sep)[-1:])
                     tmpHash = ppdeep.hash_from_file(traverseFilePath)
                     for fileHash in self.confirmPathFileHash:
-                        # print("File: ", traverseFilePath, " - ", ppdeep.compare(refHash, tmpHash))
                         if ppdeep.compare(fileHash, tmpHash) >= self.probableFilesPercent:
                             shutil.copy(traverseFilePath, self.inputFilesPath)
                             break
