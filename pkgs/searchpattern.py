@@ -51,6 +51,7 @@ class SearchPattern:
         # Preprocess the total file size
         sizeCounter = os.stat(file).st_size
 
+        self._preload_files()
         writeFilePointer = open(self.matchPatternFilePath, 'w+')
 
         with tqdm(total=sizeCounter,

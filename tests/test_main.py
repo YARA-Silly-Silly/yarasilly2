@@ -58,8 +58,15 @@ def test_main_success(mocker):
     mock_search = mocker.patch('yarasilly2.SearchPattern')
     mock_search.return_value.search.return_value = 1
 
-    mock_file = mocker.mock_open(read_data='10-pattern1\n')
-    mocker.patch('builtins.open', mock_file)
+    import builtins
+    original_open = builtins.open
+    def mock_open_file(file, *args, **kwargs):
+        if 'matched-pattern.txt' in str(file):
+            return mocker.mock_open(read_data='10-pattern1\n')()
+        else:
+            return original_open(file, *args, **kwargs)
+
+    mocker.patch('builtins.open', side_effect=mock_open_file)
 
     runner = CliRunner()
     result = runner.invoke(main, ['--rulename', 'ValidRule', '--filetype', 'office', '--loglevel', 'INFO'])
