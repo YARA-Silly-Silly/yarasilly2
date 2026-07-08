@@ -18,6 +18,7 @@ def test_searchpattern_match():
             f.write("test_string\nanother_string\n")
 
         sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
         result = sp.search(file1)
 
         assert result == 1
@@ -38,9 +39,40 @@ def test_searchpattern_no_match():
             f.write("another_string\nyet_another\n")
 
         sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
         result = sp.search(file1)
 
         assert result == 0
+
+def test_preload_files():
+    with tempfile.TemporaryDirectory() as tempFolder:
+        match_pattern_file = os.path.join(tempFolder, "matched-pattern.txt")
+
+        file1 = os.path.join(tempFolder, "file1")
+        with open(file1, 'w') as f:
+            f.write("line_one\nline_two\n")
+
+        file2 = os.path.join(tempFolder, "file2")
+        with open(file2, 'w') as f:
+            f.write("another_string\n")
+
+        # Test with a large blocksize (entire file in one read)
+        sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
+
+        assert len(sp._file_contents) == 2
+        assert sp._file_contents[file1] == {"line_one", "line_two"}
+        assert sp._file_contents[file2] == {"another_string"}
+
+        # Test with a small blocksize (multiple reads)
+        # file2 "another_string\n" -> 15 chars
+        # If we read 8 bytes at a time:
+        # read 1: "another_" -> ["another_"]
+        # read 2: "string\n" -> ["string"]
+        sp_small = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=8)
+        sp_small._preload_files()
+
+        assert sp_small._file_contents[file2] == {"another_", "string"}
 
 def test_checkIfStringInFile():
     with tempfile.TemporaryDirectory() as tempFolder:
@@ -68,6 +100,7 @@ def test_checkIfStringInFile():
             f.write("common_string\ncommon_string\ncommon_string\n")
 
         sp = SearchPattern(tempFolder, match_pattern_file, occurance=2, blocksize=1024)
+        sp._preload_files()
 
         # Test finding "common_string"
         # It starts with count = 1.
