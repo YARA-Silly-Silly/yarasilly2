@@ -1,7 +1,6 @@
 import os, sys, logging, configparser, tempfile, shutil, click, re
 from pyfiglet import Figlet
 from clint.textui import puts, colored
-from tqdm import tqdm
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
