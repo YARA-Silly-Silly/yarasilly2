@@ -3,6 +3,7 @@ from pyfiglet import Figlet
 from clint.textui import puts, colored
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
+from markupsafe import Markup
 
 from pkgs.utils import md5sum, listdir
 from pkgs.utils import splitDirFileName
@@ -35,7 +36,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
         sys.exit(1)
 
     fileLoader = FileSystemLoader('templates')
-    env = Environment(loader=fileLoader, autoescape=False) # nosec B701
+    env = Environment(loader=fileLoader, autoescape=True)
     yaraTemplate = env.get_template('default.yar')
 
     try:
@@ -104,19 +105,13 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
 
         shutil.rmtree(tempFolder)
 
-        # Sanitize user inputs to prevent template injection
-        def sanitize(s):
-            if not s:
-                return s
-            return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', ' ').replace('\r', ' ')
-
         if(foundPattern):
             templateValDict = {
                 "ruleName": rulename, # Rule name already regex-checked
-                "ruleTag": sanitize(tags),
-                "authorName": sanitize(author),
+                "ruleTag": tags,
+                "authorName": author,
                 "date": datetime.now().strftime("%Y-%m-%d"),
-                "desc": sanitize(description),
+                "desc": description,
                 "hashArray": fileHash,
                 "fileType": "office"
             }
@@ -129,13 +124,13 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
                         break
                     if "\x00" in buf:
                         str_val = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"').replace("\x00","") + "\" wide"
-                        strPatterns.append(str_val)
+                        strPatterns.append(Markup(str_val))
                     else:
                         str_val = "\"" + buf.split("-",1)[1].replace("\\","\\\\").replace('"','\\"') + "\""
-                        strPatterns.append(str_val)
+                        strPatterns.append(Markup(str_val))
 
             templateValDict["patterns"] = strPatterns
-            templateValDict["condition"] = "any of them"
+            templateValDict["condition"] = Markup("any of them")
 
             yaraOutput = yaraTemplate.render(templateValDict)
 
