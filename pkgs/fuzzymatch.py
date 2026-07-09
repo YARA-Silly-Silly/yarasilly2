@@ -15,18 +15,18 @@ class FuzzyMatch:
         self.inputFilesPath = inputFilesPath
 
     def searchFiles(self):
-        if os.listdir(self.confirmPath):
-            fileName = random.choice(os.listdir(self.confirmPath))
-            filePath = os.path.join(self.confirmPath, fileName)
+        # Preprocess the total files count
+        confirm_files = list(listdir(self.confirmPath))
+        fileCounter = len(confirm_files)
+
+        if fileCounter > 0:
+            filePath = random.choice(confirm_files)
         else:
             raise Exception("Empty confirm virus sample folder.")
 
         print("Reference File For Fuzzy Hash: {}".format(filePath))
         refHash = ppdeep.hash_from_file(filePath)
         print("Fuzzy Hash Of Reference File: {}\n".format(refHash))
-        # Preprocess the total files count
-        confirm_files = list(listdir(self.confirmPath))
-        fileCounter = len(confirm_files)
 
         if fileCounter == 1:
             self.confirmPathFileHash.append(refHash)
