@@ -1,7 +1,6 @@
 import time
 import os
 import shutil
-import ppdeep
 from pkgs.fuzzymatch import FuzzyMatch
 
 def run_bench():
