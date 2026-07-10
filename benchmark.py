@@ -1,6 +1,5 @@
 import timeit
 import re
-import os
 import tempfile
 from pkgs.stringdump import StringDump
 
