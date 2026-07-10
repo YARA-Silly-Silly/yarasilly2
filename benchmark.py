@@ -1,7 +1,6 @@
 import timeit
 import re
 import tempfile
-from pkgs.stringdump import StringDump
 
 def run_benchmark():
     # Setup test data
