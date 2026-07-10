@@ -33,3 +33,7 @@ def test_listdir():
         assert len(files) == 2
         assert any(f.endswith("file1.txt") for f in files)
         assert any(f.endswith("file2.txt") for f in files)
+
+def test_listdir_error_path():
+    with pytest.raises(FileNotFoundError):
+        list(listdir("/nonexistent/directory/path/here"))
