@@ -38,28 +38,27 @@ class StringDump:
 
     def __getStrings(self, filePath):
         allStrings = []
-        filePointer = open(filePath,'rb')
-        chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
-        regexp = '[%s]{%d,100}' % (chars, 6)
-        pattern = re.compile(regexp)
-        unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
-        while True:
-            data = filePointer.read(self.blocksize).decode('ISO-8859-1')
-            if not data:
-                break
-            strlist = pattern.findall(data)
-            if len(strlist)>0:
-                allStrings.append(strlist)
-            #Get Wide Strings
-            unicodelist = list(set(unicode_str.findall(data)))
-            if len(unicodelist)>0:
-                allStrings.append(unicodelist)
-            #Extract URLs if present
-            exeurls = self.__linkSearch(data)
-            if exeurls:
-              for url in exeurls:
-                allStrings.append(url)
-        filePointer.close()
+        with open(filePath,'rb') as filePointer:
+            chars = r"A-Za-z0-9/\-:.,_$%@'()\\\{\};\]\[<> "
+            regexp = '[%s]{%d,100}' % (chars, 6)
+            pattern = re.compile(regexp)
+            unicode_str = re.compile( r'(?:[\x20-\x7E][\x00]){6,100}',re.UNICODE )
+            while True:
+                data = filePointer.read(self.blocksize).decode('ISO-8859-1')
+                if not data:
+                    break
+                strlist = pattern.findall(data)
+                if len(strlist)>0:
+                    allStrings.append(strlist)
+                #Get Wide Strings
+                unicodelist = list(set(unicode_str.findall(data)))
+                if len(unicodelist)>0:
+                    allStrings.append(unicodelist)
+                #Extract URLs if present
+                exeurls = self.__linkSearch(data)
+                if exeurls:
+                  for url in exeurls:
+                    allStrings.append(url)
         if len(allStrings) > 0:
             return allStrings
         else:
@@ -99,4 +98,3 @@ class StringDump:
         with open(tempFile, 'w') as filePointer:
             for str in finalStringList:
                 filePointer.write(str+"\n")
-        filePointer.close()
