@@ -33,3 +33,26 @@ def test_stringdump_getstrings_no_attributes(mocker):
         assert exc.value.code == 1
         mock_puts.assert_called_once()
         assert "No Extractable Attributes Present in" in str(mock_puts.call_args[0][0])
+
+def test_stringdump_dump_strings_to_temp_file(mocker):
+    with tempfile.TemporaryDirectory() as base_temp:
+        target_temp_folder = os.path.join(base_temp, "test_temp_folder")
+
+        sd = StringDump(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'office', target_temp_folder, blocksize=1024)
+
+        mocker.patch.object(sd, '_StringDump__getStrings', return_value=[['dummy_string']])
+        mocker.patch.object(sd, '_StringDump__removeBlackListStrings', return_value=['clean_string1', 'clean_string2'])
+
+        test_file_path = "/fake/path/to/test.file.exe"
+        sd.dumpStringsToTempFile(test_file_path)
+
+        assert os.path.exists(target_temp_folder)
+
+        expected_file_name = "test-file-exe"
+        expected_file_path = os.path.join(target_temp_folder, expected_file_name)
+        assert os.path.exists(expected_file_path)
+
+        with open(expected_file_path, 'r') as f:
+            content = f.read()
+
+        assert content == "clean_string1\nclean_string2\n"
