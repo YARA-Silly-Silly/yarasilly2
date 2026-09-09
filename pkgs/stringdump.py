@@ -84,8 +84,7 @@ class StringDump:
             for str in finalStringList:
                 if regex.search(str): regmatchList.append(str)
         if len(regmatchList) > 0:
-            for match in list(set(regmatchList)):
-                finalStringList.remove(match)
+            finalStringList = list(set(finalStringList) - set(regmatchList))
         return finalStringList
 
     def dumpStringsToTempFile(self, filePath):
