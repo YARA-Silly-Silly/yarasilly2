@@ -38,6 +38,37 @@ def test_rulename_validation_invalid_path_traversal(mocker):
     # Check if mock_exit was called with 1 at least once
     assert mocker.call(1) in mock_exit.call_args_list, "Expected sys.exit(1) to be called"
 
+def test_tags_validation_invalid_characters(mocker):
+    mock_puts = mocker.patch('yarasilly2.puts')
+    mock_exit = mocker.patch('sys.exit')
+
+    runner = CliRunner()
+    runner.invoke(yarasilly2.main, ['-r', 'ValidRuleName_123', '-f', 'office', '-t', 'tags@injection"'])
+
+    called_with_error = False
+    for call in mock_puts.call_args_list:
+        if 'Wrong pattern for tags.' in str(call):
+            called_with_error = True
+            break
+
+    assert called_with_error, "Expected puts to be called with 'Wrong pattern for tags.'"
+
+    # Check if mock_exit was called with 1 at least once
+    assert mocker.call(1) in mock_exit.call_args_list, "Expected sys.exit(1) to be called"
+
+def test_tags_validation_valid(mocker):
+    mock_puts = mocker.patch('yarasilly2.puts')
+    mock_exit = mocker.patch('sys.exit')
+    mocker.patch('yarasilly2.FileSystemLoader')
+    mocker.patch('yarasilly2.Environment')
+    mocker.patch('yarasilly2.configparser.ConfigParser')
+
+    runner = CliRunner()
+    runner.invoke(yarasilly2.main, ['-r', 'ValidRuleName_123', '-f', 'office', '-t', 'valid tag 123'])
+
+    for call in mock_puts.call_args_list:
+        assert 'Wrong pattern for tags.' not in str(call)
+
 def test_rulename_validation_invalid_characters(mocker):
     mock_puts = mocker.patch('yarasilly2.puts')
     mock_exit = mocker.patch('sys.exit')

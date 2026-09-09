@@ -35,6 +35,12 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
         puts(colored.red(("[!] Wrong pattern for rule name.\n")))
         sys.exit(1)
 
+    if tags:
+        tag_pattern = re.compile(r"^[a-zA-Z0-9_ ]*$")
+        if not tag_pattern.match(tags):
+            puts(colored.red(("[!] Wrong pattern for tags.\n")))
+            sys.exit(1)
+
     fileLoader = FileSystemLoader('templates')
     env = Environment(loader=fileLoader, autoescape=True)
     yaraTemplate = env.get_template('default.yar')
