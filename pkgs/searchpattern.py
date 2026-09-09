@@ -29,11 +29,8 @@ class SearchPattern:
 
     def __checkPatternPresent(self, writeFilePointer, stringPattern):
         writeFilePointer.seek(0)
-        while True:
-            buf = writeFilePointer.readline()
-            if not buf:
-                break
-            elif buf and stringPattern in buf.split("-",1)[1]:
+        for buf in writeFilePointer:
+            if stringPattern in buf.split("-", 1)[1]:
                 return False
         return True
 
