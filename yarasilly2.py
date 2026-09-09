@@ -147,7 +147,7 @@ def main(rulename=None, filetype=None, matchpatternfile=None, inputfilepath=None
         puts(colored.yellow("[*] Good BYE. Be Secured.\n"))
     except Exception as error:
         puts(colored.red("[!] Error executing application.\n"))
-        logging.exception(error)
+        logging.error("An unexpected error occurred.")
         sys.exit(1)
     except KeyboardInterrupt:
         puts(colored.red("[!] Application Interrupted.\n"))
