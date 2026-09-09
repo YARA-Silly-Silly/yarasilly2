@@ -33,3 +33,14 @@ def test_stringdump_getstrings_no_attributes(mocker):
         assert exc.value.code == 1
         mock_puts.assert_called_once()
         assert "No Extractable Attributes Present in" in str(mock_puts.call_args[0][0])
+
+def test_stringdump_missing_blacklist_files(tmp_path):
+    tempFolder = str(tmp_path / "tempFolder")
+    emptyDir = str(tmp_path / "emptyDir")
+    file_type = "nonexistent_type"
+
+    sd = StringDump(emptyDir, file_type, tempFolder)
+
+    cache_key = (emptyDir, file_type)
+    assert sd._blacklist_cache[cache_key] == set()
+    assert sd._regexblacklist_cache[cache_key] == []
