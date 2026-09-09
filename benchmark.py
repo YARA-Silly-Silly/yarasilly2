@@ -1,33 +1,33 @@
-import timeit
+import time
+import random
+import string
 import re
-import tempfile
 
-def run_benchmark():
-    # Setup test data
-    finalStringList = [f"string_{i}" for i in range(10000)]
-    # Use random matches
-    regBlackList = [f"^string_{i}$" for i in range(0, 10000, 200)] # 50 regexes
+# generate random strings
+num_strings = 100000
+finalStringList = [''.join(random.choices(string.ascii_letters, k=10)) for _ in range(num_strings)]
+regmatchList = finalStringList[:10000] * 2  # Some duplicates
 
-    def original():
-        regmatchList = []
-        for regblack in regBlackList:
-            for s in finalStringList:
-                regex = re.compile(regblack)
-                if regex.search(s): regmatchList.append(s)
-        return regmatchList
+print(f"List size: {len(finalStringList)}")
+print(f"Matches to remove: {len(set(regmatchList))}")
 
-    def optimized():
-        regmatchList = []
-        for regblack in regBlackList:
-            regex = re.compile(regblack)
-            for s in finalStringList:
-                if regex.search(s): regmatchList.append(s)
-        return regmatchList
+# Original approach
+start_time = time.time()
+test_list = finalStringList.copy()
+if len(regmatchList) > 0:
+    for match in list(set(regmatchList)):
+        test_list.remove(match)
+end_time = time.time()
+orig_time = end_time - start_time
+print(f"Original time: {orig_time:.4f} seconds")
 
-    t_orig = timeit.timeit(original, number=10)
-    t_opt = timeit.timeit(optimized, number=10)
-    print(f"Original code: {t_orig:.4f} seconds")
-    print(f"Optimized code: {t_opt:.4f} seconds")
+# Optimized approach
+start_time = time.time()
+test_list2 = finalStringList.copy()
+if len(regmatchList) > 0:
+    test_list2 = list(set(test_list2) - set(regmatchList))
+end_time = time.time()
+opt_time = end_time - start_time
+print(f"Optimized time: {opt_time:.4f} seconds")
 
-if __name__ == "__main__":
-    run_benchmark()
+print(f"Improvement: {orig_time / opt_time:.2f}x faster")
