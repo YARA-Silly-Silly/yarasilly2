@@ -79,11 +79,13 @@ class StringDump:
         finalStringList = list(set(finalStringList) - blackListSet)
         #Match Against Regex Blacklist
         regmatchList = []
-        for regex in regexList:
-            for str in finalStringList:
-                if regex.search(str): regmatchList.append(str)
+        for str in finalStringList:
+            for regex in regexList:
+                if regex.search(str):
+                    regmatchList.append(str)
+                    break
         if len(regmatchList) > 0:
-            for match in list(set(regmatchList)):
+            for match in regmatchList:
                 finalStringList.remove(match)
         return finalStringList
 
