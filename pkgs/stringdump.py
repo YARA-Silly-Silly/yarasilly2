@@ -98,4 +98,3 @@ class StringDump:
         with open(tempFile, 'w') as filePointer:
             for str in finalStringList:
                 filePointer.write(str+"\n")
-        filePointer.close()
